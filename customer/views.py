@@ -43,7 +43,7 @@ def seller_login(request):
 
 def customer_signup(request):
     message = ''
-    
+    status = False
     if request.method == 'POST':  
         fname = request.POST['fname'] 
         lname = request.POST['lastname']
@@ -53,14 +53,20 @@ def customer_signup(request):
         country = request.POST['country']
         password = request.POST['password']
 
-        
-        customer = Customer(first_name = fname, last_name = lname , gender = gender, email = email, 
-                        city = city, country = country, password = password)
-        customer.save()
-        
-        message = 'Registration Succesful'
+        customer_exist = Customer.objects.filter(email = email).exists()
 
-    return render(request, 'customer/customer_signup.html',{'message': message})
+        if not customer_exist: 
+
+            customer = Customer(first_name = fname, last_name = lname , gender = gender, email = email, 
+                        city = city, country = country, password = password)
+            customer.save()
+            message = 'Registration Succesful'
+            status = True
+        
+        else:
+            message = 'Email Exists'     
+
+    return render(request, 'customer/customer_signup.html',{'message': message, 'status': status})
 
 
 def customer_login(request):
